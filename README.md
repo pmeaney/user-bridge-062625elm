@@ -14,6 +14,17 @@ Goals:
 - Flexibility to add more apps in the future
 - Proper role and permission management across applications
 
+## Try it out
+
+```
+git clone git@github.com:pmeaney/user-bridge.git
+cd user-bridge
+cp .env-example .env
+docker compose up
+# open 2nd terminal to run tests:
+docker compose exec api-user-bridge sh -c "pnpm test"
+```
+
 ## User Registration & App Membership
 
 When a user registers or logs in to one of the apps, this system:
