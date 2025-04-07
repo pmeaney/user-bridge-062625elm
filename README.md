@@ -2,7 +2,7 @@
 
 >"A centralized authentication service that enables seamless identity sharing between independent business applications." 
 
-User Bridge is a centralized auth service that provides an (optionally) shared user system for two or more separate, related business applications.  A person could call it "federated-authentication-service" but "user-bridge" more concise and approachable.
+User Bridge is a centralized auth service that provides an (optionally) shared user system for two or more separate, related business applications.  One could call it "federated-authentication-service" but "user-bridge" more concise and approachable.
 
 This approach creates a unified user identity system while maintaining application-specific data in each app.
 
@@ -42,7 +42,7 @@ When a user registers or logs in to one of the apps, this system:
 │  App1           │      │  App2           │
 │  ┌────────────┐ │      │  ┌────────────┐ │
 │  │ BizType1   │ │      │  │ BizType2   │ │
-│  │ Profiles   │ │      │  │ Profiles   │ │
+│  │ BizData    │ │      │  │ BizData    │ │
 │  └────────────┘ │      │  └────────────┘ │
 └─────────────────┘      └─────────────────┘
 ```
