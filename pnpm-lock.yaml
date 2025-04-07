@@ -20,6 +20,9 @@ importers:
       '@nestjs/platform-express':
         specifier: ^11.0.1
         version: 11.0.13(@nestjs/common@11.0.13(class-transformer@0.5.1)(class-validator@0.14.1)(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/core@11.0.13)
+      argon2:
+        specifier: ^0.41.1
+        version: 0.41.1
       class-transformer:
         specifier: ^0.5.1
         version: 0.5.1
@@ -60,17 +63,14 @@ importers:
       '@swc/core':
         specifier: ^1.10.7
         version: 1.11.16
-      '@types/argon2':
-        specifier: ^0.15.4
-        version: 0.15.4
       '@types/express':
-        specifier: ^5.0.0
+        specifier: ^5.0.1
         version: 5.0.1
       '@types/jest':
         specifier: ^29.5.14
         version: 29.5.14
       '@types/node':
-        specifier: ^22.10.7
+        specifier: ^22.14.0
         version: 22.14.0
       '@types/supertest':
         specifier: ^6.0.2
@@ -947,10 +947,6 @@ packages:
 
   '@tsconfig/node16@1.0.4':
     resolution: {integrity: sha512-vxhUy4J8lyeyinH7Azl1pdd43GJhZH/tP2weN8TntQblOY+A0XbT8DJk1/oCPuOOyg/Ja757rG0CgHcWC8OfMA==}
-
-  '@types/argon2@0.15.4':
-    resolution: {integrity: sha512-fZPJNvZTvoyt/okKhbyj99UsDOwqzEXYPvKqfK26mViH9JB/hOwzUwDUn5qbwq9XJkLw0kDcFNu6+bnb3u5a0A==}
-    deprecated: This is a stub types definition. argon2 provides its own type definitions, so you do not need this installed.
 
   '@types/babel__core@7.20.5':
     resolution: {integrity: sha512-qoQprZvz5wQFJwMDqeseRXWv3rqMvhgpbXFfVyWhbx9X47POIA6i/+dXefEmZKoAgOaTdaIgNSMqMIU61yRyzA==}
@@ -4479,10 +4475,6 @@ snapshots:
   '@tsconfig/node14@1.0.3': {}
 
   '@tsconfig/node16@1.0.4': {}
-
-  '@types/argon2@0.15.4':
-    dependencies:
-      argon2: 0.41.1
 
   '@types/babel__core@7.20.5':
     dependencies:
