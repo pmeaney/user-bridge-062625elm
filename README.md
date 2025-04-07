@@ -10,6 +10,9 @@ User Bridge is a centralized auth service that provides an (optionally) shared u
 ```bash
 git clone git@github.com:pmeaney/user-bridge.git
 cd user-bridge
+
+# Copy the env vars example into the .env file
+# NOTE: Be sure to generate a JWT_SECRET (e.g. `openssl rand -base64 32`) and make sure it is in .env after you run this copy command:
 cp .env-example .env
 docker compose up
 # open 2nd terminal to run tests:
@@ -59,14 +62,3 @@ When a user registers or logs in to one of the apps, this system:
 │  └────────────┘ │      │  └────────────┘ │
 └─────────────────┘      └─────────────────┘
 ```
-
-## Main dependencies
-
-`pnpm add @nestjs/config @nestjs/typeorm typeorm pg argon2 class-validator class-transformer`
-
-- @nestjs/config: For managing environment variables and configuration
-- @nestjs/typeorm and typeorm: For database interactions and ORM functionality
-- pg: PostgreSQL driver for TypeORM
-- argon2: For securely hashing passwords with the modern, memory-hard Argon2id algorithm
-- class-validator: For validating incoming data
-- class-transformer: For transforming objects (like excluding password fields from responses)

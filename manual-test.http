@@ -1,0 +1,48 @@
+### Create User
+POST http://localhost:3000/users
+Content-Type: application/json
+
+{
+    "email": "test@example.com",
+    "password": "SecurePassword123!",
+    "firstName": "John",
+    "lastName": "Doe"
+}
+
+### Login User
+POST http://localhost:3000/auth/login
+Content-Type: application/json
+
+{
+    "email": "test@example.com", 
+    "password": "SecurePassword123!"
+}
+
+### List All Users (this might require JWT token later)
+GET http://localhost:3000/users
+
+### Get Single User (replace with actual ID after creating)
+GET http://localhost:3000/users/f08b16ac-893b-4181-b2be-c98809097c81
+
+### Delete User (replace with actual ID after creating)
+DELETE http://localhost:3000/users/f08b16ac-893b-4181-b2be-c98809097c81
+
+### Create User with Duplicate Email (should fail)
+POST http://localhost:3000/users
+Content-Type: application/json
+
+{
+    "email": "test@example.com",
+    "password": "AnotherPassword123!",
+    "firstName": "Jane",
+    "lastName": "Doe"
+}
+
+### Login with Incorrect Password
+POST http://localhost:3000/auth/login
+Content-Type: application/json
+
+{
+    "email": "test@example.com",
+    "password": "WrongPassword"
+}

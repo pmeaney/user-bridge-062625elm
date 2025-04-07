@@ -3,18 +3,18 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { INestApplication, ValidationPipe } from '@nestjs/common';
 import * as request from 'supertest';
 import { AppModule } from './../src/app.module';
-import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule, ConfigService } from '@nestjs/config';
+import { TypeOrmModule } from '@nestjs/typeorm';
 
-describe('AppController (e2e)', () => {
+describe('User Authentication Flow (e2e)', () => {
   let app: INestApplication;
+  let createdUserId: string;
+  let accessToken: string;
 
-  beforeEach(async () => {
+  beforeAll(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
       imports: [
-        ConfigModule.forRoot({
-          isGlobal: true,
-        }),
+        ConfigModule.forRoot({ isGlobal: true }),
         TypeOrmModule.forRootAsync({
           imports: [ConfigModule],
           inject: [ConfigService],
@@ -39,14 +39,97 @@ describe('AppController (e2e)', () => {
       transform: true,
       forbidNonWhitelisted: true,
     }));
+
     await app.init();
   });
 
-  it('/ (GET)', () => {
-    return request(app.getHttpServer())
+  it('should return welcome message', async () => {
+    const response = await request(app.getHttpServer())
       .get('/')
-      .expect(200)
-      .expect('Welcome to user-bridge - a centralized authentication service');
+      .expect(200);
+
+    expect(response.text).toBe('Welcome to user-bridge - a centralized authentication service');
+  });
+
+  describe('User Registration', () => {
+    const userData = {
+      email: 'test@example.com',
+      password: 'SecurePassword123!',
+      firstName: 'John',
+      lastName: 'Doe'
+    };
+
+    it('should create a new user successfully', async () => {
+      const response = await request(app.getHttpServer())
+        .post('/users')
+        .send(userData)
+        .expect(201);
+
+      expect(response.body).toHaveProperty('id');
+      expect(response.body.email).toBe(userData.email);
+      createdUserId = response.body.id;
+    });
+
+    it('should reject duplicate email', async () => {
+      await request(app.getHttpServer())
+        .post('/users')
+        .send({
+          email: 'test@example.com',
+          password: 'AnotherPassword123!'
+        })
+        .expect(409);
+    });
+
+    it('should reject invalid user creation', async () => {
+      await request(app.getHttpServer())
+        .post('/users')
+        .send({
+          email: 'invalid-email',
+          password: 'short'
+        })
+        .expect(400);
+    });
+  });
+
+  describe('Authentication Flow', () => {
+    it('should login with valid credentials', async () => {
+      const response = await request(app.getHttpServer())
+        .post('/auth/login')
+        .send({
+          email: 'test@example.com',
+          password: 'SecurePassword123!'
+        })
+        .expect(200);
+
+      expect(response.body).toHaveProperty('access_token');
+      accessToken = response.body.access_token;
+    });
+
+    it('should reject login with incorrect password', async () => {
+      await request(app.getHttpServer())
+        .post('/auth/login')
+        .send({
+          email: 'test@example.com',
+          password: 'WrongPassword'
+        })
+        .expect(401);
+    });
+  });
+
+  describe('User Management', () => {
+    it('should retrieve user details', async () => {
+      await request(app.getHttpServer())
+        .get(`/users/${createdUserId}`)
+        .set('Authorization', `Bearer ${accessToken}`)
+        .expect(200);
+    });
+
+    it('should delete user', async () => {
+      await request(app.getHttpServer())
+        .delete(`/users/${createdUserId}`)
+        .set('Authorization', `Bearer ${accessToken}`)
+        .expect(204);
+    });
   });
 
   afterAll(async () => {
