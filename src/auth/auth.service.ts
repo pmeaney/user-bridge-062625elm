@@ -2,7 +2,9 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { UsersService } from '../users/users.service';
+import { User } from '../users/entities/user.entity';
 import * as argon2 from 'argon2';
+import { CreateOAuthUserDto } from 'src/users/dtos/create-oauth-user.dto';
 
 @Injectable()
 export class AuthService {
@@ -21,18 +23,56 @@ export class AuthService {
    * @returns User object without password hash if credentials are valid
    */
   async validateUser(email: string, password: string): Promise<any> {
-    // Find the user by email
     const user = await this.usersService.findByEmail(email);
 
-    // If user exists and password matches
-    if (user && await argon2.verify(user.passwordHash, password)) {
-      // Return user without the password hash
-      const { passwordHash, ...result } = user;
-      return result;
+    // Check if user exists AND has a passwordHash (not an OAuth user)
+    if (user && user.passwordHash) {
+      // Now TypeScript knows passwordHash is defined (not undefined)
+      const isPasswordValid = await argon2.verify(user.passwordHash, password);
+
+      if (isPasswordValid) {
+        const { passwordHash, ...result } = user;
+        return result;
+      }
     }
 
-    // If credentials are invalid
     return null;
+  }
+
+  // Add this to your AuthService class
+  // auth.service.ts
+  async validateGoogleUser(googleUser: {
+    email: string;
+    firstName: string;
+    lastName: string;
+    googleId: string;
+    accessToken: string;
+    refreshToken?: string;
+  }): Promise<User> {
+    // Create the DTO instance
+    const oauthUserDto = new CreateOAuthUserDto();
+    oauthUserDto.email = googleUser.email;
+    oauthUserDto.firstName = googleUser.firstName;
+    oauthUserDto.lastName = googleUser.lastName;
+    oauthUserDto.googleId = googleUser.googleId;
+    oauthUserDto.provider = 'google';
+    oauthUserDto.lastLoginAt = new Date();
+
+    let user = await this.usersService.findByEmail(googleUser.email);
+
+    if (!user) {
+      user = await this.usersService.createOAuthUser(oauthUserDto);
+    } else {
+      // Update existing user
+      user = await this.usersService.update(user.id, {
+        firstName: googleUser.firstName,
+        lastName: googleUser.lastName,
+        googleId: googleUser.googleId,
+        lastLoginAt: new Date(),
+      });
+    }
+
+    return user;
   }
 
   /**

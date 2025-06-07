@@ -1,74 +1,96 @@
 // src/users/users.service.ts
-import { Injectable, ConflictException, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import * as argon2 from 'argon2';
 import { User } from './entities/user.entity';
 import { CreateUserDto } from './dtos/create-user.dto';
+import { CreateOAuthUserDto } from './dtos/create-oauth-user.dto';
+import * as argon2 from 'argon2';
 
 @Injectable()
 export class UsersService {
   constructor(
     @InjectRepository(User)
-    private usersRepository: Repository<User>,
+    private userRepository: Repository<User>,
   ) { }
 
+  /**
+   * Create a new user with email/password
+   */
   async create(createUserDto: CreateUserDto): Promise<User> {
-    // Check if user already exists
-    const existingUser = await this.usersRepository.findOne({
-      where: { email: createUserDto.email }
-    });
+    // Hash the password before saving
+    const passwordHash = await argon2.hash(createUserDto.password);
 
-    if (existingUser) {
-      throw new ConflictException('Email already in use');
-    }
-
-    // Hash the password using Argon2id (more secure than bcrypt)
-    const passwordHash = await argon2.hash(createUserDto.password, {
-      type: argon2.argon2id,  // Use the recommended variant
-      memoryCost: 2 ** 16,      // 64 MB memory usage
-      timeCost: 3,            // Number of iterations
-      parallelism: 1          // Degree of parallelism
-    });
-
-    // Create new user instance
-    const user = this.usersRepository.create({
-      email: createUserDto.email,
+    const user = this.userRepository.create({
+      ...createUserDto,
       passwordHash,
-      firstName: createUserDto.firstName,
-      lastName: createUserDto.lastName,
-      phoneNumber: createUserDto.phoneNumber,
+      provider: 'local',
     });
 
-    // Save to database
-    return this.usersRepository.save(user);
+    return this.userRepository.save(user);
   }
 
-  async findAll(): Promise<User[]> {
-    return this.usersRepository.find();
+  /**
+   * Create a new OAuth user (Google, etc.)
+   */
+  async createOAuthUser(createOAuthUserDto: CreateOAuthUserDto): Promise<User> {
+    const user = this.userRepository.create(createOAuthUserDto);
+    return this.userRepository.save(user);
   }
 
-  async findOne(id: string): Promise<User> {
-    const user = await this.usersRepository.findOne({ where: { id } });
-    if (!user) {
-      throw new NotFoundException(`User with ID ${id} not found`);
-    }
-    return user;
-  }
-
+  /**
+   * Find a user by email
+   */
   async findByEmail(email: string): Promise<User | null> {
-    return this.usersRepository.findOne({ where: { email } });
+    return this.userRepository.findOne({ where: { email } });
   }
 
-  async remove(id: string): Promise<void> {
-    const result = await this.usersRepository.delete(id);
-    if (result.affected === 0) {
+  /**
+   * Find a user by Google ID
+   */
+  async findByGoogleId(googleId: string): Promise<User | null> {
+    return this.userRepository.findOne({ where: { googleId } });
+  }
+
+  /**
+   * Find a user by ID
+   */
+  async findById(id: string): Promise<User | null> {
+    return this.userRepository.findOne({ where: { id } });
+  }
+
+  /**
+   * Find a user by ID (alias for findById to match controller)
+   */
+  async findOne(id: string): Promise<User | null> {
+    return this.findById(id);
+  }
+
+  /**
+   * Update a user
+   */
+  async update(id: string, updateData: Partial<User>): Promise<User> {
+    await this.userRepository.update(id, updateData);
+    const updatedUser = await this.userRepository.findOne({ where: { id } });
+
+    if (!updatedUser) {
       throw new NotFoundException(`User with ID ${id} not found`);
     }
+
+    return updatedUser;
   }
 
-  // Utility method for authentication
-  async validatePassword(user: User, password: string): Promise<boolean> {
-    return argon2.verify(user.passwordHash, password);
+  /**
+   * Remove a user
+   */
+  async remove(id: string): Promise<void> {
+    await this.userRepository.delete(id);
+  }
+
+  /**
+   * Get all users (optional - for admin purposes)
+   */
+  async findAll(): Promise<User[]> {
+    return this.userRepository.find();
   }
 }

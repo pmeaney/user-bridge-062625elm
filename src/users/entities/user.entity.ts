@@ -16,9 +16,15 @@ export class User {
   @Column({ unique: true })
   email: string;
 
-  @Column()
-  @Exclude() // Exclude from API responses for security
-  passwordHash: string;
+  @Column({ nullable: true })
+  @Exclude()
+  passwordHash?: string;
+
+  @Column({ nullable: true })
+  googleId?: string;
+
+  @Column({ default: 'local' })
+  provider: string; // 'local' or 'google'
 
   @Column({ nullable: true })
   firstName: string;

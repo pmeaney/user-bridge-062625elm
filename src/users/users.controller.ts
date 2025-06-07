@@ -6,8 +6,7 @@ import {
   Body,
   Param,
   Delete,
-  ClassSerializerInterceptor,
-  UseInterceptors,
+  NotFoundException,
   HttpCode,
   HttpStatus
 } from '@nestjs/common';
@@ -16,15 +15,8 @@ import { CreateUserDto } from './dtos/create-user.dto';
 import { User } from './entities/user.entity';
 
 @Controller('users')
-@UseInterceptors(ClassSerializerInterceptor) // Automatically handles @Exclude() in entities
 export class UsersController {
   constructor(private readonly usersService: UsersService) { }
-
-  @Post()
-  @HttpCode(HttpStatus.CREATED)
-  create(@Body() createUserDto: CreateUserDto): Promise<User> {
-    return this.usersService.create(createUserDto);
-  }
 
   @Get()
   findAll(): Promise<User[]> {
@@ -32,13 +24,26 @@ export class UsersController {
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string): Promise<User> {
-    return this.usersService.findOne(id);
+  async findOne(@Param('id') id: string): Promise<User> {
+    const user = await this.usersService.findOne(id);
+    if (!user) {
+      throw new NotFoundException(`User with ID ${id} not found`);
+    }
+    return user;
+  }
+
+  @Post()
+  create(@Body() createUserDto: CreateUserDto): Promise<User> {
+    return this.usersService.create(createUserDto);
   }
 
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
-  remove(@Param('id') id: string): Promise<void> {
+  async remove(@Param('id') id: string): Promise<void> {
+    const user = await this.usersService.findOne(id);
+    if (!user) {
+      throw new NotFoundException(`User with ID ${id} not found`);
+    }
     return this.usersService.remove(id);
   }
 }
