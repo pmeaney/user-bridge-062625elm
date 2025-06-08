@@ -12,7 +12,8 @@ import { AuthModule } from './auth/auth.module';
   imports: [
     // Load environment variables
     ConfigModule.forRoot({
-      isGlobal: true,
+      isGlobal: true, // Makes ConfigService available globally
+      envFilePath: '.env', // Explicitly specify the .env file
     }),
 
     // Database connection
@@ -34,7 +35,6 @@ import { AuthModule } from './auth/auth.module';
 
     // Application modules
     UsersModule,
-
     AuthModule,
   ],
   controllers: [AppController],

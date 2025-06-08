@@ -43,4 +43,9 @@ export class AuthController {
     // If successful, req.user contains the validated user
     return this.authService.login(req.user);
   }
+
+  @Get('testing')
+  async testEnvVars() {
+    return this.authService.getEnvVars();
+  }
 }

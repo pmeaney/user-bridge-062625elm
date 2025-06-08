@@ -24,7 +24,7 @@ export class User {
   googleId?: string;
 
   @Column({ default: 'local' })
-  provider: string; // 'local' or 'google'
+  provider?: string; // 'local' or 'google'
 
   @Column({ nullable: true })
   firstName: string;
@@ -38,8 +38,8 @@ export class User {
   @Column({ default: true })
   isActive: boolean;
 
-  @Column({ nullable: true })
-  lastLoginAt: Date;
+  @Column({ type: 'timestamp', nullable: true })
+  lastLoginAt?: Date;
 
   @CreateDateColumn()
   createdAt: Date;

@@ -5,13 +5,27 @@ import { UsersService } from '../users/users.service';
 import { User } from '../users/entities/user.entity';
 import * as argon2 from 'argon2';
 import { CreateOAuthUserDto } from 'src/users/dtos/create-oauth-user.dto';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class AuthService {
   constructor(
     private usersService: UsersService,
     private jwtService: JwtService,
+    private configService: ConfigService, // Inject ConfigService
   ) { }
+
+  /**
+   * Tests access to environment variables from the .env file
+   * @returns Object containing the retrieved environment variables
+   */
+  getEnvVars() {
+    return {
+      googleClientId: this.configService.get<string>('GOOGLE_CLIENT_ID'),
+      googleClientSecret: this.configService.get<string>('GOOGLE_CLIENT_SECRET'),
+      googleCallbackUrl: this.configService.get<string>('GOOGLE_CALLBACK_URL'),
+    };
+  }
 
   /**
    * Validates a user's credentials

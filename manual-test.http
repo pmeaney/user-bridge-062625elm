@@ -9,13 +9,22 @@ Content-Type: application/json
     "lastName": "Doe"
 }
 
-### Login User
+### Login User: John Doe
 POST http://localhost:3000/auth/login
 Content-Type: application/json
 
 {
     "email": "test@example.com", 
     "password": "SecurePassword123!"
+}
+
+### Login User: Jane Doe
+POST http://localhost:3000/auth/login
+Content-Type: application/json
+
+{
+    "email": "test123@example.com", 
+    "password": "AnotherPassword123!"
 }
 
 ### List All Users (this might require JWT token later)
@@ -32,7 +41,7 @@ POST http://localhost:3000/users
 Content-Type: application/json
 
 {
-    "email": "test@example.com",
+    "email": "test123@example.com",
     "password": "AnotherPassword123!",
     "firstName": "Jane",
     "lastName": "Doe"
