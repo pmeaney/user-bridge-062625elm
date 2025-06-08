@@ -1,7 +1,6 @@
-// src/users/dtos/create-user.dto.ts
 import { IsEmail, IsNotEmpty, IsOptional, IsString, MinLength } from 'class-validator';
 
-export class CreateUserDto {
+export class CreateLocalUserDto {
   @IsEmail({}, { message: 'Please provide a valid email address' })
   @IsNotEmpty({ message: 'Email is required' })
   email: string;
@@ -9,8 +8,7 @@ export class CreateUserDto {
   @IsString()
   @MinLength(8, { message: 'Password must be at least 8 characters long' })
   @IsNotEmpty({ message: 'Password is required' })
-  @IsOptional()
-  password: string;
+  password: string;  // Required for local users!
 
   @IsString()
   @IsOptional()
@@ -19,8 +17,4 @@ export class CreateUserDto {
   @IsString()
   @IsOptional()
   lastName?: string;
-
-  @IsString()
-  @IsOptional()
-  phoneNumber?: string;
 }

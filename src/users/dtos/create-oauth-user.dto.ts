@@ -6,17 +6,17 @@ import { IsEmail, IsNotEmpty, IsOptional, IsString, IsDate } from 'class-validat
  * This is used internally by the auth service, not exposed to public API
  */
 export class CreateOAuthUserDto {
-  @IsEmail()
-  @IsNotEmpty()
+  @IsEmail({}, { message: 'Please provide a valid email address' })
+  @IsNotEmpty({ message: 'Email is required' })
   email: string;
 
   @IsString()
-  @IsNotEmpty()
-  googleId: string;
+  @IsNotEmpty({ message: 'OAuth provider is required' })
+  provider: string;  // 'google', 'github', etc.
 
   @IsString()
-  @IsNotEmpty()
-  provider: string;
+  @IsNotEmpty({ message: 'Provider ID is required' })
+  googleId: string;  // Or make this dynamic based on provider
 
   @IsString()
   @IsOptional()
@@ -27,6 +27,6 @@ export class CreateOAuthUserDto {
   lastName?: string;
 
   @IsDate()
-  @IsNotEmpty()
-  lastLoginAt: Date;
+  @IsOptional()
+  lastLoginAt?: Date;
 }

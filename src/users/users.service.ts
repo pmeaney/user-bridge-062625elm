@@ -1,9 +1,9 @@
 // src/users/users.service.ts
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, ConflictException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from './entities/user.entity';
-import { CreateUserDto } from './dtos/create-user.dto';
+import { CreateLocalUserDto } from './dtos/create-local-user.dto';
 import { CreateOAuthUserDto } from './dtos/create-oauth-user.dto';
 import * as argon2 from 'argon2';
 
@@ -15,14 +15,22 @@ export class UsersService {
   ) { }
 
   /**
-   * Create a new user with email/password
+   * Create a new user with email/password authentication
    */
-  async create(createUserDto: CreateUserDto): Promise<User> {
+  async createLocalUser(createLocalUserDto: CreateLocalUserDto): Promise<User> {
+    // Check if user already exists
+    const existingUser = await this.findByEmail(createLocalUserDto.email);
+    if (existingUser) {
+      throw new ConflictException('User with this email already exists');
+    }
+
     // Hash the password before saving
-    const passwordHash = await argon2.hash(createUserDto.password);
+    const passwordHash = await argon2.hash(createLocalUserDto.password);
 
     const user = this.userRepository.create({
-      ...createUserDto,
+      email: createLocalUserDto.email,
+      firstName: createLocalUserDto.firstName,
+      lastName: createLocalUserDto.lastName,
       passwordHash,
       provider: 'local',
     });
