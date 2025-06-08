@@ -8,6 +8,7 @@ import { AuthService } from './auth.service';
 import { LocalStrategy } from './strategies/local.strategy';
 import { JwtStrategy } from './strategies/jwt.strategy';
 import { UsersModule } from '../users/users.module';
+import { GoogleStrategy } from './strategies/google.strategy';
 
 @Module({
   imports: [
@@ -33,7 +34,8 @@ import { UsersModule } from '../users/users.module';
   providers: [
     AuthService,
     LocalStrategy,
-    JwtStrategy
+    JwtStrategy,
+    GoogleStrategy
   ],
   exports: [AuthService, JwtModule], // Note the comma here
 }) // Proper module closing

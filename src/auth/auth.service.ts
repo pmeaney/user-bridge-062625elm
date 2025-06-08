@@ -87,7 +87,7 @@ export class AuthService {
     */
     const payload = {
       email: user.email,
-      sub: user.id,
+      sub: user.id, // JWT standard for "subject" - the user this token represents
       // Later we'll add app memberships and roles here
     };
 
