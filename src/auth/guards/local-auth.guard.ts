@@ -8,6 +8,15 @@ Why have this mostly empty file & class?
 2. It could also provide Future Extensibility (i.e. we could add logic to limit login attempts to a certain time interval)
 3. It's a little cleaner in terms of Mental Context & Code files.
 
+The Complete Picture:
+So while your guards appear empty, they're actually:
+- Inheriting sophisticated authentication logic from Passport
+- Integrating properly with NestJS's systems
+- Providing extension points for future needs
+- Following framework best practices
+- Making your code more maintainable and clear
+
+This pattern - creating thin wrapper classes around framework functionality - is common in enterprise applications. It provides a clean separation between your code and third-party libraries, making it easier to adapt if requirements change.
 
 e.g. #2 above:@Injectable()
 export class LocalAuthGuard extends AuthGuard('local') {
