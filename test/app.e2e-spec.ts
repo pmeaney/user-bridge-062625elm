@@ -27,6 +27,7 @@ describe('User Authentication Flow (e2e)', () => {
             database: configService.get('DB_DATABASE', 'user_bridge_test'),
             entities: [__dirname + '/../**/*.entity{.ts,.js}'],
             synchronize: true,
+            dropSchema: true, // Clean database for each test run
           }),
         }),
         AppModule,
@@ -41,6 +42,23 @@ describe('User Authentication Flow (e2e)', () => {
     }));
 
     await app.init();
+  });
+
+  // Clean up between tests
+  beforeEach(async () => {
+    // Clear all users before each test to avoid conflicts
+    try {
+      const users = await request(app.getHttpServer()).get('/users');
+      if (users.body && Array.isArray(users.body)) {
+        for (const user of users.body) {
+          await request(app.getHttpServer())
+            .delete(`/users/${user.id}`)
+            .catch(() => { }); // Ignore errors during cleanup
+        }
+      }
+    } catch (error) {
+      // Ignore cleanup errors
+    }
   });
 
   it('should return welcome message', async () => {
@@ -71,6 +89,13 @@ describe('User Authentication Flow (e2e)', () => {
     });
 
     it('should reject duplicate email', async () => {
+      // First create a user
+      await request(app.getHttpServer())
+        .post('/users')
+        .send(userData)
+        .expect(201);
+
+      // Then try to create another with same email
       await request(app.getHttpServer())
         .post('/users')
         .send({
@@ -92,11 +117,28 @@ describe('User Authentication Flow (e2e)', () => {
   });
 
   describe('Authentication Flow', () => {
+    beforeEach(async () => {
+      // Create a user for authentication tests
+      const userData = {
+        email: 'auth-test@example.com',
+        password: 'SecurePassword123!',
+        firstName: 'Auth',
+        lastName: 'User'
+      };
+
+      const response = await request(app.getHttpServer())
+        .post('/users')
+        .send(userData)
+        .expect(201);
+
+      createdUserId = response.body.id;
+    });
+
     it('should login with valid credentials', async () => {
       const response = await request(app.getHttpServer())
         .post('/auth/login')
         .send({
-          email: 'test@example.com',
+          email: 'auth-test@example.com',
           password: 'SecurePassword123!'
         })
         .expect(200);
@@ -109,7 +151,7 @@ describe('User Authentication Flow (e2e)', () => {
       await request(app.getHttpServer())
         .post('/auth/login')
         .send({
-          email: 'test@example.com',
+          email: 'auth-test@example.com',
           password: 'WrongPassword'
         })
         .expect(401);
@@ -117,18 +159,51 @@ describe('User Authentication Flow (e2e)', () => {
   });
 
   describe('User Management', () => {
-    it('should retrieve user details', async () => {
-      await request(app.getHttpServer())
-        .get(`/users/${createdUserId}`)
-        .set('Authorization', `Bearer ${accessToken}`)
+    beforeEach(async () => {
+      // Create a user and get auth token for management tests
+      const userData = {
+        email: 'management-test@example.com',
+        password: 'SecurePassword123!',
+        firstName: 'Management',
+        lastName: 'User'
+      };
+
+      const userResponse = await request(app.getHttpServer())
+        .post('/users')
+        .send(userData)
+        .expect(201);
+
+      createdUserId = userResponse.body.id;
+
+      const loginResponse = await request(app.getHttpServer())
+        .post('/auth/login')
+        .send({
+          email: 'management-test@example.com',
+          password: 'SecurePassword123!'
+        })
         .expect(200);
+
+      accessToken = loginResponse.body.access_token;
+    });
+
+    it('should retrieve user details', async () => {
+      const response = await request(app.getHttpServer())
+        .get(`/users/${createdUserId}`)
+        .expect(200);
+
+      expect(response.body).toHaveProperty('id', createdUserId);
+      expect(response.body.email).toBe('management-test@example.com');
     });
 
     it('should delete user', async () => {
       await request(app.getHttpServer())
         .delete(`/users/${createdUserId}`)
-        .set('Authorization', `Bearer ${accessToken}`)
         .expect(204);
+
+      // Verify user is deleted
+      await request(app.getHttpServer())
+        .get(`/users/${createdUserId}`)
+        .expect(404);
     });
   });
 

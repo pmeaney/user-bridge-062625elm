@@ -4,7 +4,7 @@ import { JwtService } from '@nestjs/jwt';
 import { UsersService } from '../users/users.service';
 import { User } from '../users/entities/user.entity';
 import * as argon2 from 'argon2';
-import { CreateOAuthUserDto } from 'src/users/dtos/create-oauth-user.dto';
+import { CreateOAuthUserDto } from '../users/dtos/create-oauth-user.dto';
 import { ConfigService } from '@nestjs/config';
 
 @Injectable()

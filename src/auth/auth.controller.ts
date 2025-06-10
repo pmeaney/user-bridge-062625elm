@@ -8,7 +8,8 @@ import {
   Request,
   HttpCode,
   HttpStatus,
-  Req
+  Req,
+  ForbiddenException
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { LocalAuthGuard } from './guards/local-auth.guard';
@@ -42,6 +43,25 @@ export class AuthController {
     // The AuthGuard('google') processes the callback
     // If successful, req.user contains the validated user
     return this.authService.login(req.user);
+  }
+
+  // TEST-ONLY ENDPOINT: Simulates Google OAuth callback for testing
+  @Post('google/test-callback')
+  @HttpCode(HttpStatus.OK)
+  async testGoogleCallback(@Body() testGoogleUser: any) {
+    // Only allow in test environment for security
+    if (process.env.NODE_ENV !== 'test') {
+      throw new ForbiddenException('Test endpoint only available in test environment');
+    }
+
+    // Validate the required fields
+    if (!testGoogleUser.email || !testGoogleUser.googleId) {
+      throw new ForbiddenException('Missing required fields: email and googleId');
+    }
+
+    // Simulate what the Google strategy would do
+    const user = await this.authService.validateGoogleUser(testGoogleUser);
+    return this.authService.login(user);
   }
 
   @Get('testing')
