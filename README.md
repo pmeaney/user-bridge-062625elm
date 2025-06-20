@@ -15,9 +15,9 @@ cd user-bridge
 # NOTE: Be sure to generate a JWT_SECRET (e.g. `openssl rand -base64 32`) and make sure it is in .env after you run this copy command:
 cp .env-example .env
 docker compose up
-# open 2nd terminal to run tests: Unit Tests
+# open another terminal to run tests: Unit Tests
 docker compose exec api-user-bridge sh -c "pnpm test"
-# open 2nd terminal to run tests: End to End Tests
+# open another terminal to run tests: End to End Tests
 docker compose exec api-user-bridge sh -c "pnpm test:e2e"
 ```
 
