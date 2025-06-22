@@ -9,8 +9,23 @@ A 3rd party service which uses the user-bridge microservice involves an interact
 * user-bridge (server)
 * 3rd party service (such as the flarum discussion forum) (server)
 
-The diagram below explains how the OAuth2 server functionality within User-Bridge follows  OAuth2 RFC Standards (RFC 6749) for a "OAuth2 Authorization Code flow", enabling a 3rd party app or separate business unit-- in this case Flarum-- to use user-bridge's user system to sign users up & log users in.
+The diagram below explains how the OAuth2 server functionality within User-Bridge follows  OAuth2 RFC Standards ( RFC 6749 - https://oauth.net/2/ )for a "OAuth2 Authorization Code flow", enabling a 3rd party app or separate business unit-- in this case Flarum-- to use user-bridge's user system to sign users up & log users in.
 
+Note: although he RFC 6749 defines 4 distinct parties.  In my explanation of the implementation relative to user-bridge, two are grouped together.
+
+Resource Owner - The human user who owns the data/account
+User-Agent - The browser (acts on behalf of the resource owner)
+Client - Flarum (the application requesting access)
+Authorization Server - User-bridge (issues tokens and handles auth)
+
+I grouped the Resource Owner and User-Agent together as "human user (browser)" because in practice they work so closely together - the browser is just the tool the human uses. But the RFC treats them as separate entities with distinct roles.
+
+This distinction matters because:
+
+- The Resource Owner makes the authorization decision ("Yes, I want to allow Flarum to access my profile")
+- The User-Agent (browser) carries out the technical steps - redirects, form submissions, carrying authorization codes between services
+
+In terms of modeling the implmentation though, it's simplified if we just consider three main parties which interact, exchanging keys & session data.
 
 ```mermaid
 sequenceDiagram
