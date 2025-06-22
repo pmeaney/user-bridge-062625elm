@@ -2,7 +2,7 @@
 
 >"A centralized authentication service that enables seamless identity sharing between independent business applications." 
 
-User Bridge is a centralized auth service that provides an (optionally) shared user system for two or more separate, related business applications.  One could call it "federated-authentication-service" or "a microservice for a user system & related authentication", but "user-bridge" more concise and approachable.
+User Bridge is a centralized auth service that provides an (optionally) shared user system for two or more separate, related business applications.  One could call it "federated-authentication-service" or "a microservice for a user system & related authentication", but "user-bridge" is more concise and approachable.
 
 
 ## Try it out
@@ -33,34 +33,61 @@ Goals:
 - Flexibility to add more apps in the future
 - Proper role and permission management across applications
 
-
 When a user registers or logs in to one of the apps, this system:
 
 - Creates or verifies their identity in the Auth service
 - Creates/updates their app membership
 - Returns appropriate tokens
 
-```
-┌─────────────────────────────────────────────┐
-│             Auth Microservice               │
-│                                             │
-│  ┌─────────────┐    ┌────────────────────┐  │
-│  │   Users     │    │   App Memberships  │  │
-│  └─────────────┘    └────────────────────┘  │
-│                                             │
-│  ┌─────────────┐    ┌────────────────────┐  │
-│  │   Auth      │    │      Roles &       │  │
-│  │  Providers  │    │    Permissions     │  │
-│  └─────────────┘    └────────────────────┘  │
-└─────────────────────────────────────────────┘
-         ▲                        ▲
-         │                        │
-         ▼                        ▼
-┌─────────────────┐      ┌─────────────────┐
-│  App1           │      │  App2           │
-│  ┌────────────┐ │      │  ┌────────────┐ │
-│  │ BizType1   │ │      │  │ BizType2   │ │
-│  │ BizData    │ │      │  │ BizData    │ │
-│  └────────────┘ │      │  └────────────┘ │
-└─────────────────┘      └─────────────────┘
+
+```mermaid
+flowchart TD
+    subgraph UB["🔐 User-Bridge Auth Microservice"]
+        
+        subgraph SharedCore["Shared Core Infrastructure"]
+            Users[👥 Users Database]
+            Auth[🔐 Authentication Logic]
+            Memberships[🎫 App Memberships]
+            Roles[👑 Roles & Permissions]
+        end
+        
+        subgraph OAuth2Server["OAuth2 Server Components"]
+            Clients[📋 OAuth2 Client Registry]
+            Codes[🎟️ Auth Codes]
+            Tokens[🔑 Access Tokens]
+        end
+        
+        subgraph InternalClient["Internal Auth Client"]
+            SSO[🔄 SSO Provider]
+            Sessions[🍪 Session Management]
+            DirectLogin[🚪 Direct Login]
+        end
+        
+        %% Both components access shared core
+        SharedCore --- OAuth2Server
+        SharedCore --- InternalClient
+    end
+    
+    subgraph Internal["Internal Apps"]
+        App1[🏢 Internal SaaS 1]
+        App2[🏢 Internal SaaS 2] 
+        App3[🏢 Internal SaaS 3]
+    end
+    
+    subgraph ThirdParty["3rd Party  Integrated apps"]
+
+        Flarum[💬 Flarum Forum]
+        Nextcloud[☁️ Nextcloud]
+        Other[⚡ Other OSS Apps]
+    end
+    
+    %% Internal Auth Flow
+    InternalClient --> App1
+    InternalClient --> App2
+    InternalClient --> App3
+    
+    %% OAuth2 Flow for Third-Party Apps
+    OAuth2Server --> Flarum
+    OAuth2Server --> Nextcloud
+    OAuth2Server --> Other
 ```
