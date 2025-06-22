@@ -51,21 +51,21 @@ flowchart TD
             Roles[👑 Roles & Permissions]
         end
         
-        subgraph OAuth2Server["OAuth2 Server Components"]
-            Clients[📋 OAuth2 Client Registry]
-            Codes[🎟️ Auth Codes]
-            Tokens[🔑 Access Tokens]
-        end
-        
         subgraph InternalClient["Internal Auth Client"]
             SSO[🔄 SSO Provider]
             Sessions[🍪 Session Management]
             DirectLogin[🚪 Direct Login]
         end
         
-        %% Both components access shared core
-        SharedCore --- OAuth2Server
-        SharedCore --- InternalClient
+        subgraph OAuth2Server["OAuth2 Server Components"]
+            Clients[📋 OAuth2 Client Registry]
+            Codes[🎟️ Auth Codes]
+            Tokens[🔑 Access Tokens]
+        end
+        
+        %% Dependencies within User-Bridge
+        SharedCore --> InternalClient
+        InternalClient --> OAuth2Server
     end
     
     subgraph Internal["Internal Apps"]
@@ -74,20 +74,16 @@ flowchart TD
         App3[🏢 Internal SaaS 3]
     end
     
-    subgraph ThirdParty["3rd Party  Integrated apps"]
-
+    subgraph ThirdParty["3rd Party Integrated Apps"]
         Flarum[💬 Flarum Forum]
         Nextcloud[☁️ Nextcloud]
         Other[⚡ Other OSS Apps]
     end
     
     %% Internal Auth Flow
-    InternalClient --> App1
-    InternalClient --> App2
-    InternalClient --> App3
+    InternalClient --> Internal
     
     %% OAuth2 Flow for Third-Party Apps
-    OAuth2Server --> Flarum
-    OAuth2Server --> Nextcloud
-    OAuth2Server --> Other
+    OAuth2Server --> ThirdParty
 ```
+
