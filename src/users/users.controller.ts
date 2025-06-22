@@ -40,7 +40,7 @@ export class UsersController {
 
   /**
    * Register a new user with email/password
-   * Note: OAuth users are created internally by AuthService, not through this endpoint
+   * Note: OAuth users are created internally by AuthClientService, not through this endpoint
    * (i.e. SSO Oauth services are responsible for creating their own users-- i.e. you create a google account and that becomes your sso user,
    *  hence, we only handle creation of users when they use local login/registration strategy)
    * - Alternatively, we could create a more clear endpoint name, if we really felt the need:

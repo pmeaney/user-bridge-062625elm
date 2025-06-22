@@ -11,21 +11,21 @@ import {
   Req,
   ForbiddenException
 } from '@nestjs/common';
-import { AuthService } from './auth.service';
-import { LocalAuthGuard } from './guards/local-auth.guard';
+import { AuthClientService } from './auth-client.service';
+import { LocalAuthGuard } from './guards/local-auth-client.guard';
 import { LoginDto } from './dto/login.dto';
 import { AuthGuard } from '@nestjs/passport';
 
 @Controller('auth')
-export class AuthController {
-  constructor(private authService: AuthService) { }
+export class AuthClientController {
+  constructor(private authClientService: AuthClientService) { }
 
   @UseGuards(LocalAuthGuard)
   @Post('login')
   @HttpCode(HttpStatus.OK)
   async login(@Request() req, @Body() loginDto: LoginDto) {
     // The LocalAuthGuard will validate credentials before this method is called
-    return this.authService.login(req.user);
+    return this.authClientService.login(req.user);
   }
 
   @Get('google')
@@ -42,7 +42,7 @@ export class AuthController {
     // Google redirects here after user logs in
     // The AuthGuard('google') processes the callback
     // If successful, req.user contains the validated user
-    return this.authService.login(req.user);
+    return this.authClientService.login(req.user);
   }
 
   // TEST-ONLY ENDPOINT: Simulates Google OAuth callback for testing
@@ -60,12 +60,12 @@ export class AuthController {
     }
 
     // Simulate what the Google strategy would do
-    const user = await this.authService.validateGoogleUser(testGoogleUser);
-    return this.authService.login(user);
+    const user = await this.authClientService.validateGoogleUser(testGoogleUser);
+    return this.authClientService.login(user);
   }
 
   @Get('testing')
   async testEnvVars() {
-    return this.authService.getEnvVars();
+    return this.authClientService.getEnvVars();
   }
 }

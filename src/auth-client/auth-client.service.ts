@@ -1,4 +1,4 @@
-// src/auth/auth.service.ts
+// src/auth/auth-client.service.ts
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { UsersService } from '../users/users.service';
@@ -8,7 +8,7 @@ import { CreateOAuthUserDto } from '../users/dtos/create-oauth-user.dto';
 import { ConfigService } from '@nestjs/config';
 
 @Injectable()
-export class AuthService {
+export class AuthClientService {
   constructor(
     private usersService: UsersService,
     private jwtService: JwtService,
@@ -53,8 +53,8 @@ export class AuthService {
     return null;
   }
 
-  // Add this to your AuthService class
-  // auth.service.ts
+  // Add this to your AuthClientService class
+  // auth-client.service.ts
   async validateGoogleUser(googleUser: {
     email: string;
     firstName: string;

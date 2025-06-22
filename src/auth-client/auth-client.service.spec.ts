@@ -1,6 +1,6 @@
-// src/auth/auth.service.spec.ts
+// src/auth/auth-client.service.spec.ts
 import { Test, TestingModule } from '@nestjs/testing';
-import { AuthService } from './auth.service';
+import { AuthClientService } from './auth-client.service';
 import { UsersService } from '../users/users.service';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
@@ -11,8 +11,8 @@ jest.mock('argon2', () => ({
   hash: jest.fn(),
 }));
 
-describe('AuthService', () => {
-  let service: AuthService;
+describe('AuthClientService', () => {
+  let service: AuthClientService;
   let usersService: UsersService;
   let jwtService: JwtService;
   let configService: ConfigService;
@@ -36,7 +36,7 @@ describe('AuthService', () => {
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
-        AuthService,
+        AuthClientService,
         {
           provide: UsersService,
           useValue: mockUsersService,
@@ -52,7 +52,7 @@ describe('AuthService', () => {
       ],
     }).compile();
 
-    service = module.get<AuthService>(AuthService);
+    service = module.get<AuthClientService>(AuthClientService);
     usersService = module.get<UsersService>(UsersService);
     jwtService = module.get<JwtService>(JwtService);
     configService = module.get<ConfigService>(ConfigService);

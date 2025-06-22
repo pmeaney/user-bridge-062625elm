@@ -3,13 +3,13 @@ import { Injectable } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
 import { Strategy, VerifyCallback } from 'passport-google-oauth20';
 import { ConfigService } from '@nestjs/config';
-import { AuthService } from '../auth.service';
+import { AuthClientService } from '../auth-client.service';
 
 @Injectable()
 export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
   constructor(
     private configService: ConfigService,
-    private authService: AuthService,
+    private authClientService: AuthClientService,
   ) {
     super({
       clientID: configService.get<string>('GOOGLE_CLIENT_ID') || '',
@@ -42,8 +42,8 @@ export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
         refreshToken,
       };
 
-      // You'll need to implement this method in your AuthService
-      const validatedUser = await this.authService.validateGoogleUser(user);
+      // You'll need to implement this method in your AuthClientService
+      const validatedUser = await this.authClientService.validateGoogleUser(user);
 
       done(null, validatedUser);
     } catch (error) {

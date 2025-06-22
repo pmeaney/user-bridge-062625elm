@@ -1,4 +1,4 @@
-import { LocalAuthGuard } from './local-auth.guard';
+import { LocalAuthGuard } from './local-auth-client.guard';
 
 describe('LocalAuthGuard', () => {
   it('should be defined', () => {

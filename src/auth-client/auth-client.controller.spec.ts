@@ -1,11 +1,11 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { AuthController } from './auth.controller';
-import { AuthService } from './auth.service';
+import { AuthClientController } from './auth-client.controller';
+import { AuthClientService } from './auth-client.service';
 import { LoginDto } from './dto/login.dto';
 
-describe('AuthController', () => {
-  let controller: AuthController;
-  let authService: AuthService;
+describe('AuthClientController', () => {
+  let controller: AuthClientController;
+  let authClientService: AuthClientService;
 
   const mockAuthService = {
     login: jest.fn(),
@@ -14,17 +14,17 @@ describe('AuthController', () => {
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      controllers: [AuthController],
+      controllers: [AuthClientController],
       providers: [
         {
-          provide: AuthService,
+          provide: AuthClientService,
           useValue: mockAuthService,
         },
       ],
     }).compile();
 
-    controller = module.get<AuthController>(AuthController);
-    authService = module.get<AuthService>(AuthService);
+    controller = module.get<AuthClientController>(AuthClientController);
+    authClientService = module.get<AuthClientService>(AuthClientService);
   });
 
   it('should be defined', () => {
@@ -32,7 +32,7 @@ describe('AuthController', () => {
   });
 
   describe('login', () => {
-    it('should call authService.login', async () => {
+    it('should call authClientService.login', async () => {
       const mockRequest = { user: { id: '1', email: 'test@example.com' } };
       const loginDto: LoginDto = {
         email: 'test@example.com',
@@ -43,7 +43,7 @@ describe('AuthController', () => {
 
       const result = await controller.login(mockRequest, loginDto);
 
-      expect(authService.login).toHaveBeenCalledWith(mockRequest.user);
+      expect(authClientService.login).toHaveBeenCalledWith(mockRequest.user);
       expect(result).toEqual({ access_token: 'test-token' });
     });
   });

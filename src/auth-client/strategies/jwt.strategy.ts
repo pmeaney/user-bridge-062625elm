@@ -20,7 +20,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
 
   /**
    * Validates and transforms JWT payload into user object
-   * Called automatically by Passport when using JwtAuthGuard
+   * Called automatically by Passport when using JwtAuthClientGuard
    */
   async validate(payload: any) {
     // Return user data from payload

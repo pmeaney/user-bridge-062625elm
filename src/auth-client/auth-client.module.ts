@@ -3,8 +3,8 @@ import { PassportModule } from '@nestjs/passport';
 import { JwtModule } from '@nestjs/jwt';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 
-import { AuthController } from './auth.controller';
-import { AuthService } from './auth.service';
+import { AuthClientController } from './auth-client.controller';
+import { AuthClientService } from './auth-client.service';
 import { LocalStrategy } from './strategies/local.strategy';
 import { JwtStrategy } from './strategies/jwt.strategy';
 import { UsersModule } from '../users/users.module';
@@ -30,13 +30,13 @@ import { GoogleStrategy } from './strategies/google.strategy';
       }),
     }),
   ],
-  controllers: [AuthController],
+  controllers: [AuthClientController],
   providers: [
-    AuthService,
+    AuthClientService,
     LocalStrategy,
     JwtStrategy,
     GoogleStrategy
   ],
-  exports: [AuthService, JwtModule], // Note the comma here
+  exports: [AuthClientService, JwtModule], // Note the comma here
 }) // Proper module closing
-export class AuthModule { } // Added explicit class export
+export class AuthClientModule { } // Added explicit class export

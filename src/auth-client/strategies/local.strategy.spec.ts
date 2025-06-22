@@ -1,17 +1,17 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { LocalStrategy } from './local.strategy';
-import { AuthService } from '../auth.service';
+import { AuthClientService } from '../auth-client.service';
 
 describe('LocalStrategy', () => {
   let strategy: LocalStrategy;
-  let authService: AuthService;
+  let authClientService: AuthClientService;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         LocalStrategy,
         {
-          provide: AuthService,
+          provide: AuthClientService,
           useValue: {
             validateUser: jest.fn()
           }
@@ -20,7 +20,7 @@ describe('LocalStrategy', () => {
     }).compile();
 
     strategy = module.get<LocalStrategy>(LocalStrategy);
-    authService = module.get<AuthService>(AuthService);
+    authClientService = module.get<AuthClientService>(AuthClientService);
   });
 
   it('should be defined', () => {
